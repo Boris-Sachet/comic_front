@@ -43,11 +43,23 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    final currentLibrary = ServiceLibrary.currentLibrary;
-    if (currentLibrary == null) {
-      return LibrarySelector();
-    } else {
-      return LibraryFolder(library: currentLibrary);
-    }
+    return FutureBuilder(
+      future: ServiceLibrary.getCurrentLibrary(),
+      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasError) {
+            return Center(child: Text(snapshot.error.toString()),);
+          }
+          if (snapshot.data == null) {
+            return const LibrarySelector();
+          } else {
+            return LibraryFolder(library: snapshot.data!);
+          }
+        } else {
+          return const Center(child: CircularProgressIndicator(),);
+        }
+      },
+    );
+
   }
 }

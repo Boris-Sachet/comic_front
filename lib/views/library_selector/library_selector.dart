@@ -18,7 +18,7 @@ class LibrarySelectorState extends State<LibrarySelector> {
       appBar: AppBar(
         title: const Text('Select Library'),
       ),
-      body: LibraryList(librariesFuture: ServiceLibrary().getLibraries())
+      body: LibraryList(librariesFuture: ServiceLibrary.getLibraries())
     );
   }
 }

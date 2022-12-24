@@ -1,3 +1,4 @@
+import 'package:comic_front/services/service_library.dart';
 import 'package:flutter/material.dart';
 import '../../../model/library.dart';
 import '../../library_folder/library_folder.dart';
@@ -6,7 +7,8 @@ class LibraryList extends StatelessWidget {
   final Future<List<Library>> librariesFuture;
   const LibraryList({super.key, required this.librariesFuture,});
 
-  Container generateTile(BuildContext context, Library library) {
+  /// List tile for a library item
+  Container libraryTile(BuildContext context, Library library) {
     return Container(
         color: Colors.blueGrey,
         child: ListTile(
@@ -14,12 +16,15 @@ class LibraryList extends StatelessWidget {
           title: Text(library.name),
           subtitle: Text(library.path),
           trailing: const Icon(Icons.keyboard_arrow_right),
-          onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LibraryFolder(library: library,),
-                ),
-              ),
+          onTap: () {
+            ServiceLibrary.setCurrentLibrary(library);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LibraryFolder(library: library,),
+              )
+            );
+          },
         )
     );
   }
@@ -36,7 +41,7 @@ class LibraryList extends StatelessWidget {
               itemCount: libraries.length,
               scrollDirection: Axis.vertical,
               itemBuilder: (BuildContext context, int index) {
-                return generateTile(context, libraries[index]);
+                return libraryTile(context, libraries[index]);
               },
             );
           } else {

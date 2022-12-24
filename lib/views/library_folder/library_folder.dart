@@ -20,7 +20,7 @@ class _LibraryFolderState extends State<LibraryFolder> {
   @override
   void initState() {
     super.initState();
-    futureContent = ServiceLibrary().getLibraryContent(widget.library.name, widget.directory.path);
+    futureContent = ServiceLibrary.getLibraryContent(widget.library.name, widget.directory.path);
   }
 
   /// Create a List tile for a Directory object
