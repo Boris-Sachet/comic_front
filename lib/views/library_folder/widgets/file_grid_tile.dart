@@ -17,6 +17,7 @@ class FileGridTile extends StatelessWidget {
   final Color progressLineBgColor;
   final double progressLineBgColorOpacity;
   final double progressLineFontSizeFactor;
+  final String placeholder;
 
 
   const FileGridTile({
@@ -32,6 +33,7 @@ class FileGridTile extends StatelessWidget {
     this.progressLineBgColor = Colors.grey,
     this.progressLineBgColorOpacity = 0.2,
     this.progressLineFontSizeFactor = 0.5,
+    this.placeholder = "assets/icons/comic.png",
   });
 
   /// Generate a row for the title
@@ -97,7 +99,7 @@ class FileGridTile extends StatelessWidget {
       // child: const Text("Placeholder"),
       child: FadeInImage(
         image: NetworkImage(ServiceLibrary.getFileCoverUrl(file.id)),
-        placeholder: const AssetImage("assets/icons/comic.png"),
+        placeholder: AssetImage(placeholder),
       ),
     );
   }
