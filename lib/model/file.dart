@@ -3,7 +3,6 @@ class File {
   final String name;
   final int pagesCount;
   final int currentPage;
-  final String type = 'file';
 
   const File({
     required this.id,
