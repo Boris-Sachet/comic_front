@@ -73,4 +73,8 @@ class ServiceLibrary{
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('currentLibraryName', library.name);
   }
+
+  static String getFileCoverUrl(String fileId) {
+    return 'http://$_baseUrl/file/comics/$fileId/cover';
+  }
 }
