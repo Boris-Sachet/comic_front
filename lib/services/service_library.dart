@@ -8,7 +8,8 @@ import '../model/directory.dart';
 import '../model/file.dart';
 
 class ServiceLibrary{
-  static const String _baseUrl = '192.168.1.18:8042';
+  // static const String _baseUrl = '192.168.1.18:8042';
+  static const String _baseUrl = '10.0.2.2:8000';
   static Library? _currentLibrary;
 
 
