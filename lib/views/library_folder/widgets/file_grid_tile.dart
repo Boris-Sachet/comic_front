@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
@@ -97,9 +98,10 @@ class FileGridTile extends StatelessWidget {
           )
       ),
       // child: const Text("Placeholder"),
-      child: FadeInImage(
-        image: NetworkImage(ServiceLibrary.getFileCoverUrl(file.id)),
-        placeholder: AssetImage(placeholder),
+      child: CachedNetworkImage(
+          imageUrl: ServiceLibrary.getFileCoverUrl(file.id),
+          placeholder: (context, url) => Image.asset(placeholder),
+          errorWidget: (context, url, error) => Image.asset(placeholder),
       ),
     );
   }
