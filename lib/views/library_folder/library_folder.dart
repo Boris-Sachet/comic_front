@@ -7,6 +7,7 @@ import '../../model/directory.dart';
 import '../../model/file.dart';
 import '../../model/library.dart';
 import '../../services/service_library.dart';
+import '../drawer/global_drawer.dart';
 
 class LibraryFolder extends StatefulWidget {
   final Library library;
@@ -53,6 +54,7 @@ class LibraryFolderState extends State<LibraryFolder> {
     return WillPopScope(
         onWillPop: () async => false, // Disable back button
         child: Scaffold(
+          drawer: const GlobalDrawer(),
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(kToolbarHeight),
             child: LibraryAppBar(
@@ -67,6 +69,8 @@ class LibraryFolderState extends State<LibraryFolder> {
               if (snapshot.hasData) {
                 final List<Directory> directories = snapshot.data![0] as List<Directory>;
                 final List<File> files = snapshot.data![1] as List<File>;
+                if (files.isEmpty && directories.isEmpty) return const Center(child: Text("Library is empty"),);
+
                 return CustomScrollView(
                   slivers: <Widget>[
                     SliverList(

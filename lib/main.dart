@@ -46,6 +46,8 @@ class _MyHomePageState extends State<MyHomePage> {
     return FutureBuilder(
       future: ServiceLibrary.getCurrentLibrary(),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        // Check if there's already a selected library and get it from the backend and redirect to it
+        // Or else redirect to the library selector
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasError) {
             return Center(child: Text(snapshot.error.toString()),);
