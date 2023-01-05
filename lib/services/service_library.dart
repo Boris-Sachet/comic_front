@@ -39,13 +39,13 @@ class ServiceLibrary{
 
 
   /// Get the content of a directory in a library
-  static Future<List> getLibraryContent(String libraryName, String directoryPath) async {
-    final response = await http.get(Uri.parse('http://$_baseUrl/library/$libraryName/content/?path=$directoryPath'));
+  static Future<List> getLibraryContent(Library library, String directoryPath) async {
+    final response = await http.get(Uri.parse('http://$_baseUrl/library/${library.name}/content/?path=$directoryPath'));
 
     if (response.statusCode == 200) {
       final List<dynamic> json = jsonDecode(utf8.decode(response.bodyBytes));
       final List<Directory> directories = (json[0] as List).map((dynamic item) => Directory.fromJson(item)).toList();
-      final List<File> files = (json[1] as List).map((dynamic item) => File.fromJson(item)).toList();
+      final List<File> files = (json[1] as List).map((dynamic item) => File.fromJson(item, library)).toList();
 
       directories.sort((a, b) => a.name.compareTo(b.name));
       files.sort((a, b) => a.name.compareTo(b.name));
@@ -75,7 +75,7 @@ class ServiceLibrary{
     await prefs.setString('currentLibraryName', library.name);
   }
 
-  static String getFileCoverUrl(String fileId) {
-    return 'http://$_baseUrl/file/comics/$fileId/cover';
+  static String get baseUrl {
+    return _baseUrl;
   }
 }

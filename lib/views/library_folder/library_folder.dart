@@ -25,7 +25,7 @@ class LibraryFolderState extends State<LibraryFolder> {
   @override
   void initState() {
     super.initState();
-    futureContent = ServiceLibrary.getLibraryContent(widget.library.name, widget.directory.path);
+    futureContent = ServiceLibrary.getLibraryContent(widget.library, widget.directory.path);
   }
   
   /// Generate list view of directories
@@ -85,7 +85,7 @@ class LibraryFolderState extends State<LibraryFolder> {
                       ),
                       delegate: SliverChildBuilderDelegate(
                             (context, index) {
-                          return FileGridTile(file: files[index]);
+                          return FileGridTile(library: widget.library, file: files[index]);
                         },
                         childCount: files.length,
                       ),

@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
 import '../../../model/file.dart';
-import '../../../services/service_library.dart';
+import '../../../model/library.dart';
 
 /// Create a GridList tile for a File object
 class FileGridTile extends StatelessWidget {
+  final Library library;
   final File file;
   final Color infoBackgroundColor;
   final double infoBackgroundColorOpacity;
@@ -23,6 +24,7 @@ class FileGridTile extends StatelessWidget {
 
   const FileGridTile({
     super.key,
+    required this.library,
     required this.file,
     this.infoBackgroundColor = Colors.black54,
     this.infoBackgroundColorOpacity = 0.7,
@@ -99,7 +101,7 @@ class FileGridTile extends StatelessWidget {
       ),
       // child: const Text("Placeholder"),
       child: CachedNetworkImage(
-          imageUrl: ServiceLibrary.getFileCoverUrl(file.id),
+          imageUrl: file.coverUrl,
           placeholder: (context, url) => Image.asset(placeholder),
           errorWidget: (context, url, error) => Image.asset(placeholder),
       ),
