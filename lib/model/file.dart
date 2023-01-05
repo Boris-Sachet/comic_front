@@ -30,4 +30,12 @@ class File {
   String get coverUrl {
     return 'http://${ServiceLibrary.baseUrl}/file/${library.name}/$id/cover';
   }
+
+  List<String> get pagesUrl {
+    List<String> result = [];
+    for (var i = 0; i <= pagesCount; i++) {
+      result.add('http://${ServiceLibrary.baseUrl}/file/${library.name}/$id/page/$i');
+    }
+    return result;
+  }
 }

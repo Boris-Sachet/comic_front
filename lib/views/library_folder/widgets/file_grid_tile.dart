@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:comic_front/views/reader/reader.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 
@@ -99,12 +100,17 @@ class FileGridTile extends StatelessWidget {
             },
           )
       ),
-      // child: const Text("Placeholder"),
-      child: CachedNetworkImage(
+      child: InkWell(
+        child: CachedNetworkImage(
           imageUrl: file.coverUrl,
           placeholder: (context, url) => Image.asset(placeholder),
           errorWidget: (context, url, error) => Image.asset(placeholder),
-      ),
+        ),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => Reader(file: file))
+        ),
+      )
     );
   }
 
