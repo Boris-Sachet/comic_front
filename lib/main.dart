@@ -26,6 +26,7 @@ class MyApp extends StatelessWidget {
         title: 'Comic Reader',
         theme: theme,
         darkTheme: darkTheme,
+        debugShowCheckedModeBanner: false,
         home: const MyHomePage(title: 'Comic Reader Home Page'),
       ),
     );

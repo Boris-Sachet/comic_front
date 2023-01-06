@@ -6,10 +6,10 @@ class File {
   final String id;
   final String name;
   final int pagesCount;
-  final int currentPage;
+  late  int currentPage;
   final Library library;
 
-  const File({
+  File({
     required this.id,
     required this.name,
     required this.pagesCount,

@@ -1,5 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:comic_front/services/service_file.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:photo_view/photo_view.dart';
 
 import '../../model/file.dart';
@@ -9,18 +12,18 @@ class Reader extends StatefulWidget {
   final File file;
 
   @override
-  _ReaderState createState() => _ReaderState();
+  ReaderState createState() => ReaderState();
 
 }
 
-class _ReaderState extends State<Reader> {
+class ReaderState extends State<Reader> {
   late bool _showAppBar;
-  Axis _axis = Axis.vertical;
-  Icon _icon = Icon(Icons.stay_current_portrait);
+  Axis _axis = Axis.horizontal;
+  Icon _icon = const Icon(Icons.stay_current_landscape);
 
   @override
   void initState() {
-    _showAppBar = true;
+    _showAppBar = false;
     super.initState();
   }
 
@@ -28,72 +31,79 @@ class _ReaderState extends State<Reader> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: !_showAppBar ? null : AppBar(
-        title: Text(
-          widget.file.name,
-          style: const TextStyle(fontSize: 14),
-        ),
-        actions: [
-          IconButton(
-            icon: _icon,
-            onPressed: () {
-              setState(() {
-                if (_axis == Axis.vertical) {
-                  _axis = Axis.horizontal;
-                  _icon = const Icon(Icons.stay_current_landscape);
-                } else {
-                  _axis = Axis.vertical;
-                  _icon = const Icon(Icons.stay_current_portrait);
-                }
-              });
-            },
-          )
-        ],
-        // backgroundColor: Colors.black,
-      ),
-      body: widget.file.pagesCount > 0 ? CustomScrollView(
-        scrollDirection: _axis,
-        slivers: [
-          SliverList(
-              delegate: SliverChildBuilderDelegate((context, index) {
-                return Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: PhotoView(
-                          imageProvider: CachedNetworkImageProvider(widget.file.pagesUrl[index]),
-                          onTapDown: (context, details, controllerValue) {
-                                // Hide app bar on scroll down
-                                setState(() {_showAppBar = !_showAppBar;});
-                              },
-                          onTapUp: (context, details, controllerValue) {
-                            // Show app bar on scroll down
-                            setState(() {_showAppBar = !_showAppBar;});
-                          },
-                          backgroundDecoration: const BoxDecoration(color: Colors.black),
-                        ),
-                      ),
-                      Positioned(
-                        right: -1,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            "$index / ${widget.file.pagesCount}",
-                            style: const TextStyle(color: Colors.white),
-                          )
-                        )
-                      )
-                    ],
-                  ),
-                );
-              },
-              childCount: widget.file.pagesCount
-              ),
-          )
-        ],
-      ) : Center(child: Container(),),
+      appBar: !_showAppBar ? null : buildAppBar(),
+      body: widget.file.pagesCount > 0 ? buildCarouselSlider() : Center(child: Container(),),
     );
+  }
+
+  AppBar buildAppBar() {
+    return AppBar(
+      title: Text(
+        widget.file.name,
+        style: const TextStyle(fontSize: 14),
+      ),
+      automaticallyImplyLeading: false,
+      actions: [
+        IconButton(
+          icon: _icon,
+          onPressed: () {
+            setState(() {switchScrollDirection();});
+          },
+        )
+      ],
+      // backgroundColor: Colors.black,
+    );
+  }
+
+  CarouselSlider buildCarouselSlider() {
+    final double height = MediaQuery.of(context).size.height;
+    return CarouselSlider.builder(
+        itemCount: widget.file.pagesCount,
+        itemBuilder: (context, index, pageViewIndex) => Center(
+          child: PhotoView(
+            imageProvider: CachedNetworkImageProvider(widget.file.pagesUrl[index]),
+            onTapDown: (context, details, controllerValue) {
+              // Hide app bar on scroll down
+              setState(() {_showAppBar = !_showAppBar;});
+            },
+            backgroundDecoration: const BoxDecoration(color: Colors.black),
+          ),
+        ),
+        options: CarouselOptions(
+          autoPlay: false,
+          enableInfiniteScroll: false,
+          viewportFraction: 1.0,
+          enlargeCenterPage: false,
+          height: height,
+          clipBehavior: Clip.hardEdge,
+          pageSnapping: true,
+          scrollDirection: _axis,
+          initialPage: widget.file.currentPage,
+          scrollPhysics: const PageScrollPhysics(),
+          onPageChanged: onPageChange,
+        )
+    );
+  }
+
+  void onPageChange(int index, CarouselPageChangedReason changeReason) {
+    widget.file.currentPage = index;
+    prefetchNextImage(index);
+    ServiceFile.setCurrentPage(widget.file, index);
+  }
+
+  void switchScrollDirection(){
+    if (_axis == Axis.vertical) {
+      _axis = Axis.horizontal;
+      _icon = const Icon(Icons.stay_current_landscape);
+    } else {
+      _axis = Axis.vertical;
+      _icon = const Icon(Icons.stay_current_portrait);
+    }
+  }
+
+  void prefetchNextImage(int index){
+    if (index < widget.file.pagesCount - 1) {
+      DefaultCacheManager().downloadFile(widget.file.pagesUrl[index+1]);
+    }
   }
 }
