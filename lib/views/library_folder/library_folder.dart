@@ -20,12 +20,11 @@ class LibraryFolder extends StatefulWidget {
 }
 
 class LibraryFolderState extends State<LibraryFolder> {
-  late Future<List> futureContent;
+  late Future<List> futureContent = ServiceLibrary.getLibraryContent(widget.library, widget.directory.path);
 
   @override
   void initState() {
     super.initState();
-    futureContent = ServiceLibrary.getLibraryContent(widget.library, widget.directory.path);
   }
   
   /// Generate list view of directories
@@ -63,40 +62,43 @@ class LibraryFolderState extends State<LibraryFolder> {
             ),
           ),
 
-          body: FutureBuilder<List>(
-            future: futureContent,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                final List<Directory> directories = snapshot.data![0] as List<Directory>;
-                final List<File> files = snapshot.data![1] as List<File>;
-                if (files.isEmpty && directories.isEmpty) return const Center(child: Text("Library is empty"),);
+          body: RefreshIndicator(
+            onRefresh: () async { setState(() {}); },
+            child: FutureBuilder<List>(
+              future: futureContent,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final List<Directory> directories = snapshot.data![0] as List<Directory>;
+                  final List<File> files = snapshot.data![1] as List<File>;
+                  if (files.isEmpty && directories.isEmpty) return const Center(child: Text("Library is empty"),);
 
-                return CustomScrollView(
-                  slivers: <Widget>[
-                    SliverList(
-                      delegate: SliverChildListDelegate(
-                        generateDirectoryList(directories)
-                      ),
-                    ),
-                    SliverGrid(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 1.0,
-                      ),
-                      delegate: SliverChildBuilderDelegate(
-                            (context, index) {
-                          return FileGridTile(library: widget.library, file: files[index]);
-                        },
-                        childCount: files.length,
-                      ),
-                    )
-                  ]
-                );
-              } else if (snapshot.hasError) {
-                return Text('${snapshot.error}');
-              }
-              return const Center(child: CircularProgressIndicator(),);
-            },
+                  return CustomScrollView(
+                      slivers: <Widget>[
+                        SliverList(
+                          delegate: SliverChildListDelegate(
+                              generateDirectoryList(directories)
+                          ),
+                        ),
+                        SliverGrid(
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 1.0,
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                                (context, index) {
+                              return FileGridTile(library: widget.library, file: files[index]);
+                            },
+                            childCount: files.length,
+                          ),
+                        )
+                      ]
+                  );
+                } else if (snapshot.hasError) {
+                  return Text('${snapshot.error}');
+                }
+                return const Center(child: CircularProgressIndicator(),);
+              },
+            ),
           ),
         ),
     );
