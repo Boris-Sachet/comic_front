@@ -17,6 +17,7 @@ class FileGridTile extends StatelessWidget {
   final int titleMaxLines;
   final double progressLineHeight;
   final Color progressLineColor;
+  final Color progressLineReadColor;
   final Color progressLineBgColor;
   final double progressLineBgColorOpacity;
   final double progressLineFontSizeFactor;
@@ -34,6 +35,7 @@ class FileGridTile extends StatelessWidget {
     this.titleMaxLines = 2,
     this.progressLineHeight = 7.0,
     this.progressLineColor = Colors.orange,
+    this.progressLineReadColor = Colors.green,
     this.progressLineBgColor = Colors.grey,
     this.progressLineBgColorOpacity = 0.2,
     this.progressLineFontSizeFactor = 0.5,
@@ -69,11 +71,11 @@ class FileGridTile extends StatelessWidget {
         LinearPercentIndicator(
           width: constraints.maxWidth,
           lineHeight: progressLineHeight,
-          percent: file.currentPage / file.pagesCount,
-          progressColor: progressLineColor,
+          percent: file.currentPage / (file.pagesCount - 1),
+          progressColor: file.read ? progressLineReadColor : progressLineColor,
           backgroundColor: progressLineBgColor.withOpacity(progressLineBgColorOpacity),
           center: Text(
-            "${file.currentPage}/${file.pagesCount}",
+            file.currentPage == 0 ? "${file.pagesCount}" : "${file.currentPage + 1}/${file.pagesCount}",
             style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: progressLineFontSizeFactor),
           ),
         ),

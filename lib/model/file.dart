@@ -38,4 +38,8 @@ class File {
     }
     return result;
   }
+
+  bool get read {
+    return currentPage + 1 == pagesCount;
+  }
 }
