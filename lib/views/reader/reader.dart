@@ -57,6 +57,28 @@ class ReaderState extends State<Reader> {
     );
   }
 
+  PhotoViewGallery buildPhotoViewGallery() {
+    return PhotoViewGallery.builder(
+      itemCount: widget.file.pagesCount,
+      builder: (context, index) {
+        return PhotoViewGalleryPageOptions(
+          imageProvider: CachedNetworkImageProvider(widget.file.pagesUrl[index]),
+          minScale: PhotoViewComputedScale.contained * 0.8,
+          maxScale: PhotoViewComputedScale.contained * 2,
+          onTapDown: (context, details, controllerValue) {
+            // Hide app bar on scroll down
+            setState(() {_showAppBar = !_showAppBar;});
+          },
+        );
+      },
+      onPageChanged: onPageChange,
+      scrollPhysics: const BouncingScrollPhysics(),
+      backgroundDecoration: BoxDecoration(
+        color: Theme.of(context).canvasColor,
+      ),
+    );
+  }
+
   SafeArea buildExtendedImage() {
     return SafeArea(
         child: ExtendedImageGesturePageView.builder(
