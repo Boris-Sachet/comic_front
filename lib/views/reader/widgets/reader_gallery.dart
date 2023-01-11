@@ -53,7 +53,7 @@ class ReaderGallery extends StatelessWidget {
 
   void prefetchNextImage(int index){
     if (index < file.pagesCount - 1) {
-      DefaultCacheManager().downloadFile(file.pagesUrl[index+1]);
+      DefaultCacheManager().downloadFile(file.pagesUrl[index + 1]);
     }
   }
 }
