@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:comic_front/services/service_file.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:photo_view/photo_view.dart';
@@ -32,7 +33,8 @@ class ReaderState extends State<Reader> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: !_showAppBar ? null : buildAppBar(),
-      body: widget.file.pagesCount > 0 ? buildCarouselSlider() : Center(child: Container(),),
+      // body: widget.file.pagesCount > 0 ? buildCarouselSlider() : Center(child: Container(),),
+      body: widget.file.pagesCount > 0 ? buildExtendedImage() : Center(child: Container(),),
     );
   }
 
@@ -54,6 +56,46 @@ class ReaderState extends State<Reader> {
       // backgroundColor: Colors.black,
     );
   }
+
+  SafeArea buildExtendedImage() {
+    return SafeArea(
+        child: ExtendedImageGesturePageView.builder(
+          pageSnapping: true,
+          preloadPagesCount: 1,
+          itemCount: widget.file.pagesCount,
+          onPageChanged: onPageChange,
+          scrollDirection: _axis,
+          itemBuilder: (context, index) {
+            return ExtendedImage.network(
+              widget.file.pagesUrl[index],
+              fit: BoxFit.contain,
+              mode: ExtendedImageMode.gesture,
+              enableMemoryCache: true,
+              // onDoubleTap: ,
+              initGestureConfigHandler: (ExtendedImageState state) {
+                return GestureConfig(
+                  minScale: 0.9,
+                  animationMinScale: 0.7,
+                  maxScale: 4.0,
+                  animationMaxScale: 4.5,
+                  speed: 1.0,
+                  inertialSpeed: 100.0,
+                  initialScale: 1.0,
+                  inPageView: true,
+                  initialAlignment: InitialAlignment.center,
+                  reverseMousePointerScrollDirection: true,
+                  gestureDetailsIsChanged: (GestureDetails? details) {},
+                );
+              },
+            );
+          }
+        )
+    );
+  }
+
+  // onDoubleTaped(ExtendedImageGestureState state) {
+  //   state.widget.
+  // },
 
   CarouselSlider buildCarouselSlider() {
     final double height = MediaQuery.of(context).size.height;
@@ -80,12 +122,12 @@ class ReaderState extends State<Reader> {
           scrollDirection: _axis,
           initialPage: widget.file.currentPage,
           scrollPhysics: const PageScrollPhysics(),
-          onPageChanged: onPageChange,
+          // onPageChanged: onPageChange,
         )
     );
   }
 
-  void onPageChange(int index, CarouselPageChangedReason changeReason) {
+  void onPageChange(int index) {
     widget.file.currentPage = index;
     prefetchNextImage(index);
     ServiceFile.setCurrentPage(widget.file, index);
