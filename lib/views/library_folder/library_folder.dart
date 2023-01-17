@@ -30,12 +30,16 @@ class LibraryFolderState extends State<LibraryFolder> {
   /// Generate list view of directories
   List<Widget> generateDirectoryList (List<Directory> directories) {
     // To still display the back button on directories with no subfolders
-    int itemCount = !widget.directory.isRoot() && directories.isEmpty ? 1 : directories.length;
+    int backIndex = 0;
+    int itemCount = directories.length;
+    if (!widget.directory.isRoot()) {
+      // If folder is not root back button must be displayed
+      itemCount = directories.length + 1;
+    }
     return [ListView.builder(physics: const ScrollPhysics(),
       shrinkWrap: true,
       itemCount: itemCount,
       itemBuilder: (BuildContext context, int index) {
-        int backIndex = 0;
         if (index == 0 && !widget.directory.isRoot()) {
           backIndex = 1;
           return BackTile(library: widget.library, directory: widget.directory);
@@ -51,7 +55,7 @@ class LibraryFolderState extends State<LibraryFolder> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-        onWillPop: () async => false, // Disable back button
+        onWillPop: () async => true, // Disable back button
         child: Scaffold(
           drawer: const GlobalDrawer(),
           appBar: PreferredSize(

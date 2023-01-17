@@ -22,13 +22,14 @@ class BackTile extends StatelessWidget {
       child: ListTile(
         leading: const Icon(Icons.arrow_back),
         title: const Text(".."),
-        // subtitle: Text(directory.path),
-        onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => LibraryFolder(library: library, directory: directory.parent,)
-            )
-        ),
+        // subtitle: Text(directory.parent.path),
+        // onTap: () => Navigator.push(
+        //     context,
+        //     MaterialPageRoute(
+        //         builder: (context) => LibraryFolder(library: library, directory: directory.parent,)
+        //     )
+        // ),
+        onTap: () => Navigator.pop(context),
       ),
     );
   }
