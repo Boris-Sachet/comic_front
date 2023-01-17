@@ -1,6 +1,7 @@
 import 'package:comic_front/views/library_folder/widgets/back_tile.dart';
 import 'package:comic_front/views/library_folder/widgets/directory_list_tile.dart';
 import 'package:comic_front/views/library_folder/widgets/file_grid_tile.dart';
+import 'package:comic_front/views/library_folder/widgets/file_option_bar.dart';
 import 'package:comic_front/views/library_folder/widgets/folder_app_bar.dart';
 import 'package:flutter/material.dart';
 import '../../model/directory.dart';
@@ -21,15 +22,16 @@ class LibraryFolder extends StatefulWidget {
 
 class LibraryFolderState extends State<LibraryFolder> {
   late Future<List> futureContent = ServiceLibrary.getLibraryContent(widget.library, widget.directory.path);
+  File? selectedFile;
 
   @override
   void initState() {
     super.initState();
+    futureContent = ServiceLibrary.getLibraryContent(widget.library, widget.directory.path);
   }
   
   /// Generate list view of directories
   List<Widget> generateDirectoryList (List<Directory> directories) {
-    // To still display the back button on directories with no subfolders
     int backIndex = 0;
     int itemCount = directories.length;
     if (!widget.directory.isRoot()) {
@@ -67,7 +69,9 @@ class LibraryFolderState extends State<LibraryFolder> {
           ),
 
           body: RefreshIndicator(
-            onRefresh: () async { setState(() {}); },
+            onRefresh: () async { setState(() {
+              futureContent = ServiceLibrary.getLibraryContent(widget.library, widget.directory.path);
+            }); },
             child: FutureBuilder<List>(
               future: futureContent,
               builder: (context, snapshot) {
@@ -90,7 +94,8 @@ class LibraryFolderState extends State<LibraryFolder> {
                           ),
                           delegate: SliverChildBuilderDelegate(
                                 (context, index) {
-                              return FileGridTile(library: widget.library, file: files[index]);
+                              return FileGridTile(library: widget.library, file: files[index], onLongPress: selectFile,);
+                              // return FileGridTile(library: widget.library, file: files[index],);
                             },
                             childCount: files.length,
                           ),
@@ -104,7 +109,21 @@ class LibraryFolderState extends State<LibraryFolder> {
               },
             ),
           ),
+          bottomNavigationBar: selectedFile ==  null ? null : FileOptionBar(file: selectedFile!, onFileModified: setStateAction,),
         ),
     );
+  }
+
+  void selectFile(File? file){
+    setState(() {
+      selectedFile = file;
+    });
+  }
+
+  void setStateAction(File updatedFile){
+    setState(() {
+      selectedFile = updatedFile;
+      futureContent = ServiceLibrary.getLibraryContent(widget.library, widget.directory.path);
+    });
   }
 }

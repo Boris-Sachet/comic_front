@@ -7,7 +7,7 @@ import '../../../model/file.dart';
 import '../../../model/library.dart';
 
 /// Create a GridList tile for a File object
-class FileGridTile extends StatelessWidget {
+class FileGridTile extends StatefulWidget {
   final Library library;
   final File file;
   final Color infoBackgroundColor;
@@ -22,7 +22,7 @@ class FileGridTile extends StatelessWidget {
   final double progressLineBgColorOpacity;
   final double progressLineFontSizeFactor;
   final String placeholder;
-
+  final Function? onLongPress;
 
   const FileGridTile({
     super.key,
@@ -40,7 +40,63 @@ class FileGridTile extends StatelessWidget {
     this.progressLineBgColorOpacity = 0.2,
     this.progressLineFontSizeFactor = 0.5,
     this.placeholder = "assets/icons/comic.png",
+    this.onLongPress,
   });
+
+  @override
+  FileGridTileState createState() => FileGridTileState();
+}
+
+class FileGridTileState extends State<FileGridTile>{
+  bool isSelected = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GridTile(
+        footer: Container(
+            color: widget.infoBackgroundColor.withOpacity(widget.infoBackgroundColorOpacity),
+            width: double.maxFinite,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return Column(
+                  children: [
+                    // Title
+                    titleRow(context, constraints, widget.file),
+                    // Reading progress
+                    progressRow(context, constraints, widget.file),
+                  ],
+                );
+              },
+            )
+        ),
+        child: InkWell(
+          onTap: () => {
+            if (isSelected){
+              isSelected = false,
+              widget.onLongPress!(null),
+            } else {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Reader(file: widget.file))
+              ),
+            }
+          },
+          onLongPress: onLongPressAction,
+          child: CachedNetworkImage(
+            imageUrl: widget.file.coverUrl,
+            placeholder: (context, url) => Image.asset(widget.placeholder),
+            errorWidget: (context, url, error) => Image.asset(widget.placeholder),
+          ),
+        )
+    );
+  }
+
+  void onLongPressAction(){
+    if (widget.onLongPress != null){
+      isSelected = true;
+      widget.onLongPress!(widget.file);
+    }
+  }
 
   /// Generate a row for the title
   Row titleRow(BuildContext context, BoxConstraints constraints, File file) {
@@ -49,12 +105,12 @@ class FileGridTile extends StatelessWidget {
       children: [
         Expanded(
             child: Padding(
-              padding: EdgeInsets.only(left: titlePadding, right: titlePadding),
+              padding: EdgeInsets.only(left: widget.titlePadding, right: widget.titlePadding),
               child: Text(
                 file.name,
-                style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: titleFontSizeFactor),
+                style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: widget.titleFontSizeFactor),
                 overflow: TextOverflow.ellipsis,
-                maxLines: titleMaxLines,
+                maxLines: widget.titleMaxLines,
                 softWrap: false,
               ),
             )
@@ -70,50 +126,16 @@ class FileGridTile extends StatelessWidget {
       children: [
         LinearPercentIndicator(
           width: constraints.maxWidth,
-          lineHeight: progressLineHeight,
+          lineHeight: widget.progressLineHeight,
           percent: file.currentPage / (file.pagesCount - 1),
-          progressColor: file.read ? progressLineReadColor : progressLineColor,
-          backgroundColor: progressLineBgColor.withOpacity(progressLineBgColorOpacity),
+          progressColor: file.read ? widget.progressLineReadColor : widget.progressLineColor,
+          backgroundColor: widget.progressLineBgColor.withOpacity(widget.progressLineBgColorOpacity),
           center: Text(
             file.currentPage == 0 ? "${file.pagesCount}" : "${file.currentPage + 1}/${file.pagesCount}",
-            style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: progressLineFontSizeFactor),
+            style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: widget.progressLineFontSizeFactor),
           ),
         ),
       ],
     );
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return GridTile(
-      footer: Container(
-          color: infoBackgroundColor.withOpacity(infoBackgroundColorOpacity),
-          width: double.maxFinite,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return Column(
-                children: [
-                  // Title
-                  titleRow(context, constraints, file),
-                  // Reading progress
-                  progressRow(context, constraints, file),
-                ],
-              );
-            },
-          )
-      ),
-      child: InkWell(
-        child: CachedNetworkImage(
-          imageUrl: file.coverUrl,
-          placeholder: (context, url) => Image.asset(placeholder),
-          errorWidget: (context, url, error) => Image.asset(placeholder),
-        ),
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => Reader(file: file))
-        ),
-      )
-    );
-  }
-
 }
