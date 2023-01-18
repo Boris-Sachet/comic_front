@@ -11,6 +11,7 @@ class FileGridTile extends StatefulWidget {
   final Library library;
   final File file;
   final Color infoBackgroundColor;
+  final Color infoBackgroundSelectedColor;
   final double infoBackgroundColorOpacity;
   final double titlePadding;
   final double titleFontSizeFactor;
@@ -29,6 +30,7 @@ class FileGridTile extends StatefulWidget {
     required this.library,
     required this.file,
     this.infoBackgroundColor = Colors.black54,
+    this.infoBackgroundSelectedColor = Colors.orange,
     this.infoBackgroundColorOpacity = 0.7,
     this.titlePadding = 1,
     this.titleFontSizeFactor = 0.8,
@@ -49,12 +51,19 @@ class FileGridTile extends StatefulWidget {
 
 class FileGridTileState extends State<FileGridTile>{
   bool isSelected = false;
+  late Color footerColor;
+
+  @override
+  void initState() {
+    super.initState();
+    footerColor = widget.infoBackgroundColor;
+  }
 
   @override
   Widget build(BuildContext context) {
     return GridTile(
         footer: Container(
-            color: widget.infoBackgroundColor.withOpacity(widget.infoBackgroundColorOpacity),
+            color: footerColor.withOpacity(widget.infoBackgroundColorOpacity),
             width: double.maxFinite,
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -72,7 +81,7 @@ class FileGridTileState extends State<FileGridTile>{
         child: InkWell(
           onTap: () => {
             if (isSelected){
-              isSelected = false,
+              toggleIsSelected(),
               widget.onLongPress!(null),
             } else {
               Navigator.push(
@@ -93,8 +102,18 @@ class FileGridTileState extends State<FileGridTile>{
 
   void onLongPressAction(){
     if (widget.onLongPress != null){
-      isSelected = true;
+      toggleIsSelected();
       widget.onLongPress!(widget.file);
+    }
+  }
+
+  void toggleIsSelected() {
+    if (isSelected){
+      isSelected = false;
+      footerColor = widget.infoBackgroundColor;
+    } else {
+      isSelected = true;
+      footerColor = widget.infoBackgroundSelectedColor;
     }
   }
 
