@@ -1,21 +1,19 @@
 import 'dart:convert';
 
+import 'package:comic_front/services/service_settings.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/library.dart';
 import '../model/directory.dart';
 import '../model/file.dart';
 
-class ServiceLibrary{
-  static const String _baseUrl = '192.168.1.18:8042';
-  // static const String _baseUrl = '10.0.2.2:8000';
+class ServiceLibrary {
   static Library? _currentLibrary;
 
 
   /// Get a list of all libraries
   static Future<List<Library>> getLibraries() async {
-    final response = await http.get(Uri.parse('http://$_baseUrl/library'));
+    final response = await http.get(Uri.parse('http://${ServiceSettings.apiUrl}/library'));
     if (response.statusCode == 200) {
       final List<dynamic> json = jsonDecode(response.body);
       final List<Library> libraries = json.map((dynamic item) => Library.fromJson(item)).toList();
@@ -28,7 +26,7 @@ class ServiceLibrary{
 
   /// Get a library by name
   static Future<Library> getLibrary(String libraryName) async {
-    final response = await http.get(Uri.parse('http://$_baseUrl/library/$libraryName'));
+    final response = await http.get(Uri.parse('http://${ServiceSettings.apiUrl}/library/$libraryName'));
 
     if (response.statusCode == 200) {
       return Library.fromJson(jsonDecode(response.body));
@@ -40,7 +38,7 @@ class ServiceLibrary{
 
   /// Get the content of a directory in a library
   static Future<List> getLibraryContent(Library library, String directoryPath) async {
-    final response = await http.get(Uri.parse('http://$_baseUrl/library/${library.name}/content/?path=$directoryPath'));
+    final response = await http.get(Uri.parse('http://${ServiceSettings.apiUrl}/library/${library.name}/content/?path=$directoryPath'));
 
     if (response.statusCode == 200) {
       final List<dynamic> json = jsonDecode(utf8.decode(response.bodyBytes));
@@ -54,28 +52,5 @@ class ServiceLibrary{
     } else {
       throw Exception('Failed to fetch library folder content');
     }
-  }
-
-  /// Get the current library from persistent storage and retrieve it from api if it exist
-  static Future<Library?> getCurrentLibrary() async {
-    if (_currentLibrary == null) {
-      final prefs = await SharedPreferences.getInstance();
-      final prefCurrentLibraryName = prefs.getString('currentLibraryName');
-      if (prefCurrentLibraryName != null) {
-        _currentLibrary = await getLibrary(prefCurrentLibraryName);
-      }
-    }
-    return _currentLibrary;
-  }
-
-  /// Set the current library value, in this class and store it's name async in persistent storage
-  static void setCurrentLibrary(Library library) async {
-    _currentLibrary = library;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('currentLibraryName', library.name);
-  }
-
-  static String get baseUrl {
-    return _baseUrl;
   }
 }

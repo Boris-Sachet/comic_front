@@ -1,6 +1,6 @@
 import 'package:comic_front/model/library.dart';
 
-import '../services/service_library.dart';
+import '../services/service_settings.dart';
 
 class File {
   final String id;
@@ -28,13 +28,13 @@ class File {
   }
 
   String get coverUrl {
-    return 'http://${ServiceLibrary.baseUrl}/file/${library.name}/$id/cover';
+    return 'http://${ServiceSettings.apiUrl}/file/${library.name}/$id/cover';
   }
 
   List<String> get pagesUrl {
     List<String> result = [];
     for (var i = 0; i <= pagesCount; i++) {
-      result.add('http://${ServiceLibrary.baseUrl}/file/${library.name}/$id/page/$i');
+      result.add('http://${ServiceSettings.apiUrl}/file/${library.name}/$id/page/$i');
     }
     return result;
   }

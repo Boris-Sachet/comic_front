@@ -1,4 +1,5 @@
 import 'package:comic_front/services/service_library.dart';
+import 'package:comic_front/services/service_settings.dart';
 import 'package:flutter/material.dart';
 import '../../../model/library.dart';
 import '../../library_folder/library_folder.dart';
@@ -17,7 +18,7 @@ class LibraryList extends StatelessWidget {
           subtitle: Text(library.path),
           trailing: const Icon(Icons.keyboard_arrow_right),
           onTap: () {
-            ServiceLibrary.setCurrentLibrary(library);
+            ServiceSettings.currentLibrary = library;
             Navigator.push(
               context,
               MaterialPageRoute(

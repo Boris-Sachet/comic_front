@@ -1,3 +1,4 @@
+import 'package:comic_front/services/service_settings.dart';
 import 'package:comic_front/views/library_selector/library_selector.dart';
 import 'package:flutter/material.dart';
 import 'services/service_library.dart';
@@ -45,19 +46,18 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: ServiceLibrary.getCurrentLibrary(),
-      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+      future: ServiceSettings.init(),
+      builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
         // Check if there's already a selected library and get it from the backend and redirect to it
         // Or else redirect to the library selector
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasError) {
-            return Center(child: Text(snapshot.error.toString()),);
+            if (ServiceSettings.apiUrl == null) {
+              return const Scaffold(body: Center(child: Text('No api url configured')),);
+            }
+            return Scaffold(body: Center(child: Text(snapshot.error.toString()),),);
           }
-          if (snapshot.data == null) {
-            return const LibrarySelector();
-          } else {
-            return LibraryFolder(library: snapshot.data!);
-          }
+          return ServiceSettings.currentLibrary != null ? LibraryFolder(library: ServiceSettings.currentLibrary!) : const LibrarySelector();
         } else {
           return const Center(child: CircularProgressIndicator(),);
         }
