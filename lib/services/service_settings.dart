@@ -83,7 +83,7 @@ class ServiceSettings {
   }
 
   static set darkMode(bool darkMode) {
-    _showHiddenLibraries = darkMode;
+    _darkMode = darkMode;
     SharedPreferences.getInstance().then((pref) => pref.setBool('darkMode', darkMode).then((value) => {}));
   }
 }
