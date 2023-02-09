@@ -2,6 +2,7 @@ import 'package:comic_front/services/service_settings.dart';
 import 'package:flutter/material.dart';
 
 import '../library_selector/library_selector.dart';
+import '../settings/settings_page.dart';
 
 class GlobalDrawer extends StatelessWidget {
   const GlobalDrawer({
@@ -24,6 +25,12 @@ class GlobalDrawer extends StatelessWidget {
               title: const Text("Select library"),
               onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => const LibrarySelector()));
+              },
+            ),),
+            Card(child: ListTile(
+              title: const Text("Settings"),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsPage()));
               },
             ),),
           ],)),

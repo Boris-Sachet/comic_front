@@ -1,13 +1,14 @@
 import 'package:comic_front/services/service_library.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/library.dart';
 
 class ServiceSettings {
-  static String? _apiUrl; // = '192.168.1.18:8042';
+  static String? _apiUrl;
   static Library? _currentLibrary;
   static bool _showHiddenLibraries = false;
-  static bool _darkMode = false;
+  static bool? _darkMode;
 
   static Future<void> init() async {
     await _initApiUrl();
@@ -21,6 +22,7 @@ class ServiceSettings {
     final prefs = await SharedPreferences.getInstance();
     // _apiUrl = prefs.getString('apiUrl');
     _apiUrl = '192.168.1.18:8042';
+    // _apiUrl = '10.0.2.2:8000';
   }
 
   static String? get apiUrl {
@@ -52,7 +54,7 @@ class ServiceSettings {
   static set currentLibrary(Library? library) {
     _currentLibrary = library;
     SharedPreferences.getInstance().then((pref) => {
-      if (library != null) {pref.setString('currentLibraryName', library.name)}
+      if (library != null && !library.hidden) {pref.setString('currentLibraryName', library.name)}
       else {pref.remove('currentLibraryName')}
     });
   }
@@ -75,11 +77,11 @@ class ServiceSettings {
   /// Get the darkMode status from persistent storage and retrieve it from api if it exist
   static Future<void> _initDarkMode() async {
     final prefs = await SharedPreferences.getInstance();
-    _showHiddenLibraries = prefs.getBool('darkMode') ?? false;
+    _darkMode = prefs.getBool('darkMode') ?? WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
   }
 
   static bool get darkMode {
-    return _darkMode;
+    return _darkMode ?? WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
   }
 
   static set darkMode(bool darkMode) {

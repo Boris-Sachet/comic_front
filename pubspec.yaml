@@ -43,6 +43,7 @@ dependencies:
   cached_network_image: ^3.2.3
   photo_view: ^0.14.0
   flutter_cache_manager: ^3.3.0
+  settings_ui: ^2.0.2
 
 dev_dependencies:
   flutter_test:
