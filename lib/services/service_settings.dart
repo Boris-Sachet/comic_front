@@ -1,6 +1,11 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:comic_front/services/service_library.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+
 
 import '../model/library.dart';
 
@@ -20,9 +25,7 @@ class ServiceSettings {
   /// Get the apiUrl from persistent storage and retrieve it from api if it exist
   static Future<void> _initApiUrl() async {
     final prefs = await SharedPreferences.getInstance();
-    // _apiUrl = prefs.getString('apiUrl');
-    _apiUrl = '192.168.1.18:8042';
-    // _apiUrl = '10.0.2.2:8000';
+    _apiUrl = prefs.getString('apiUrl');
   }
 
   static String? get apiUrl {
@@ -34,6 +37,18 @@ class ServiceSettings {
     SharedPreferences.getInstance().then((pref) => {
       if (url != null) {pref.setString('apiUrl', url)} else {pref.remove('apiUrl')}
     });
+  }
+
+  /// Test the connectivity to a comic back api
+  static Future<bool> pingApiUrl(String url) async {
+    try {
+      final response = await http.get(Uri.parse('http://$url/ping')).timeout(const Duration(seconds: 5));
+      if (response.statusCode == 200 && response.body == "pong") {
+        return true;
+      } return false;
+    }
+    on SocketException catch (_) { return false; }
+    on TimeoutException catch (_) { return false; }
   }
 
   /// Get the current library from persistent storage and retrieve it from api if it exist

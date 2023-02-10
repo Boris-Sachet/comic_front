@@ -1,4 +1,5 @@
 import 'package:comic_front/services/service_settings.dart';
+import 'package:comic_front/views/api_url_form/api_url_form.dart';
 import 'package:comic_front/views/library_selector/library_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
@@ -47,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     if (ServiceSettings.apiUrl == null) {
-      return const Scaffold(body: Center(child: Text('No api url configured')),);
+      return const ApiUrlForm();
     }
     return ServiceSettings.currentLibrary != null ? LibraryFolder(library: ServiceSettings.currentLibrary!) : const LibrarySelector();
     // return FutureBuilder(

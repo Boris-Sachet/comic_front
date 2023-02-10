@@ -8,9 +8,6 @@ import '../model/directory.dart';
 import '../model/file.dart';
 
 class ServiceLibrary {
-  static Library? _currentLibrary;
-
-
   /// Get a list of all libraries
   static Future<List<Library>> getLibraries() async {
     final response = await http.get(Uri.parse('http://${ServiceSettings.apiUrl}/library'));
