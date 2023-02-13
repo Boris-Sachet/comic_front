@@ -1,5 +1,3 @@
-import 'dart:js';
-
 import 'package:comic_front/services/service_file.dart';
 import 'package:flutter/material.dart';
 
