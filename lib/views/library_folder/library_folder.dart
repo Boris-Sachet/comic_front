@@ -62,6 +62,7 @@ class LibraryFolderState extends State<LibraryFolder> {
         onWillPop: () async => true, // Disable back button
         child: Scaffold(
           drawer: const GlobalDrawer(),
+          // AppBar
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(kToolbarHeight),
             child: LibraryAppBar(
