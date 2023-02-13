@@ -23,6 +23,8 @@ class LibraryFolder extends StatefulWidget {
 class LibraryFolderState extends State<LibraryFolder> {
   late Future<List> futureContent = ServiceLibrary.getLibraryContent(widget.library, widget.directory.path);
   final List<File> selectedFiles = [];
+  late List<Directory> directories;
+  late List<File> files;
 
   @override
   void initState() {
@@ -65,6 +67,9 @@ class LibraryFolderState extends State<LibraryFolder> {
             child: LibraryAppBar(
               library: widget.library,
               directory: widget.directory,
+              selectedFiles: selectedFiles,
+              selectAll: selectAllFiles,
+              unselectAll: unselectAllFiles,
             ),
           ),
 
@@ -76,8 +81,8 @@ class LibraryFolderState extends State<LibraryFolder> {
               future: futureContent,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  final List<Directory> directories = snapshot.data![0] as List<Directory>;
-                  final List<File> files = snapshot.data![1] as List<File>;
+                  directories = snapshot.data![0] as List<Directory>;
+                  files = snapshot.data![1] as List<File>;
                   if (files.isEmpty && directories.isEmpty) return const Center(child: Text("Library is empty"),);
 
                   updateSelectedItems(files);
@@ -145,6 +150,21 @@ class LibraryFolderState extends State<LibraryFolder> {
         }
       }
     }
+  }
+
+  /// Select all files
+  void selectAllFiles() {
+    selectedFiles.clear();
+    setState(() {
+      selectedFiles.addAll(files);
+    });
+  }
+
+  /// Unselect all files
+  void unselectAllFiles() {
+    setState(() {
+      selectedFiles.clear();
+    });
   }
 
   /// Callback to be called after a file has been modified, update the view
