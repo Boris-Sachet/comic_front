@@ -10,6 +10,7 @@ import '../../../model/library.dart';
 class FileGridTile extends StatefulWidget {
   final Library library;
   final File file;
+  final List<File> selectedFiles;
   final Color infoBackgroundColor;
   final Color infoBackgroundSelectedColor;
   final double infoBackgroundColorOpacity;
@@ -23,12 +24,14 @@ class FileGridTile extends StatefulWidget {
   final double progressLineBgColorOpacity;
   final double progressLineFontSizeFactor;
   final String placeholder;
-  final Function? onLongPress;
+  final Function select;
+  final Function unselect;
 
   const FileGridTile({
     super.key,
     required this.library,
     required this.file,
+    required this.selectedFiles,
     this.infoBackgroundColor = Colors.black54,
     this.infoBackgroundSelectedColor = Colors.orange,
     this.infoBackgroundColorOpacity = 0.7,
@@ -42,7 +45,8 @@ class FileGridTile extends StatefulWidget {
     this.progressLineBgColorOpacity = 0.2,
     this.progressLineFontSizeFactor = 0.5,
     this.placeholder = "assets/icons/comic.png",
-    this.onLongPress,
+    required this.select,
+    required this.unselect,
   });
 
   @override
@@ -51,19 +55,17 @@ class FileGridTile extends StatefulWidget {
 
 class FileGridTileState extends State<FileGridTile>{
   bool isSelected = false;
-  late Color footerColor;
 
   @override
   void initState() {
     super.initState();
-    footerColor = widget.infoBackgroundColor;
   }
 
   @override
   Widget build(BuildContext context) {
     return GridTile(
         footer: Container(
-            color: footerColor.withOpacity(widget.infoBackgroundColorOpacity),
+            color: widget.selectedFiles.contains(widget.file) ? widget.infoBackgroundSelectedColor.withOpacity(widget.infoBackgroundColorOpacity) : widget.infoBackgroundColor.withOpacity(widget.infoBackgroundColorOpacity),
             width: double.maxFinite,
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -79,17 +81,7 @@ class FileGridTileState extends State<FileGridTile>{
             )
         ),
         child: InkWell(
-          onTap: () => {
-            if (isSelected){
-              toggleIsSelected(),
-              widget.onLongPress!(null),
-            } else {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Reader(file: widget.file))
-              ),
-            }
-          },
+          onTap: onTapAction,
           onLongPress: onLongPressAction,
           child: CachedNetworkImage(
             imageUrl: widget.file.coverUrl,
@@ -100,20 +92,21 @@ class FileGridTileState extends State<FileGridTile>{
     );
   }
 
-  void onLongPressAction(){
-    if (widget.onLongPress != null){
-      toggleIsSelected();
-      widget.onLongPress!(widget.file);
+  /// Select the file
+  void onLongPressAction() {
+    if (!widget.selectedFiles.contains(widget.file)){
+      widget.select(widget.file);
     }
   }
 
-  void toggleIsSelected() {
-    if (isSelected){
-      isSelected = false;
-      footerColor = widget.infoBackgroundColor;
+  /// If file is selected, unselect it. Else if there is already a file selected select it. Else open it in the reader
+  void onTapAction() {
+    if (widget.selectedFiles.contains(widget.file)){
+      widget.unselect(widget.file);
+    } else if (widget.selectedFiles.isNotEmpty) {
+      widget.select(widget.file);
     } else {
-      isSelected = true;
-      footerColor = widget.infoBackgroundSelectedColor;
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Reader(file: widget.file)));
     }
   }
 

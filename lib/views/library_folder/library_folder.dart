@@ -22,7 +22,7 @@ class LibraryFolder extends StatefulWidget {
 
 class LibraryFolderState extends State<LibraryFolder> {
   late Future<List> futureContent = ServiceLibrary.getLibraryContent(widget.library, widget.directory.path);
-  File? selectedFile;
+  final List<File> selectedFiles = [];
 
   @override
   void initState() {
@@ -80,6 +80,8 @@ class LibraryFolderState extends State<LibraryFolder> {
                   final List<File> files = snapshot.data![1] as List<File>;
                   if (files.isEmpty && directories.isEmpty) return const Center(child: Text("Library is empty"),);
 
+                  updateSelectedItems(files);
+
                   return CustomScrollView(
                       slivers: <Widget>[
                         SliverList(
@@ -94,8 +96,13 @@ class LibraryFolderState extends State<LibraryFolder> {
                           ),
                           delegate: SliverChildBuilderDelegate(
                                 (context, index) {
-                              return FileGridTile(library: widget.library, file: files[index], onLongPress: selectFile,);
-                              // return FileGridTile(library: widget.library, file: files[index],);
+                              return FileGridTile(
+                                  library: widget.library,
+                                  file: files[index],
+                                  selectedFiles: selectedFiles,
+                                  select: selectFile,
+                                  unselect: unselectFile,
+                              );
                             },
                             childCount: files.length,
                           ),
@@ -109,20 +116,40 @@ class LibraryFolderState extends State<LibraryFolder> {
               },
             ),
           ),
-          bottomNavigationBar: selectedFile ==  null ? null : FileOptionBar(file: selectedFile!, onFileModified: setStateAction,),
+          bottomNavigationBar: selectedFiles.isEmpty ? null : FileOptionBar(selectedFiles: selectedFiles, onFileModified: modifiedFile,),
         ),
     );
   }
 
-  void selectFile(File? file){
+  /// Select file callback
+  void selectFile(File file){
     setState(() {
-      selectedFile = file;
+      selectedFiles.add(file);
     });
   }
 
-  void setStateAction(File updatedFile){
+  /// Unselect file callback
+  void unselectFile(File file){
     setState(() {
-      selectedFile = updatedFile;
+      selectedFiles.remove(file);
+    });
+  }
+
+  /// Update the list of selected files with the equivalent new objects after a
+  void updateSelectedItems(List<File> files) {
+    for (var i = 0; i < selectedFiles.length; i++) {
+      for (var file in files) {
+        if (selectedFiles[i].id == file.id) {
+          selectedFiles[i] = file;
+          break;
+        }
+      }
+    }
+  }
+
+  /// Callback to be called after a file has been modified, update the view
+  void modifiedFile(){
+    setState(() {
       futureContent = ServiceLibrary.getLibraryContent(widget.library, widget.directory.path);
     });
   }

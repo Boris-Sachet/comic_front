@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import '../../../model/file.dart';
 
 class FileOptionBar extends StatelessWidget {
-  final File file;
+  final List<File> selectedFiles;
   final Function onFileModified;
 
   const FileOptionBar({
     super.key,
-    required this.file,
+    required this.selectedFiles,
     required this.onFileModified
   });
 
@@ -21,10 +21,15 @@ class FileOptionBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
           IconButton(
-            icon: file.read ? const Icon(Icons.remove_red_eye) : const Icon(Icons.remove_red_eye_outlined),
+            icon: selectedFiles[0].read ? const Icon(Icons.remove_red_eye) : const Icon(Icons.remove_red_eye_outlined),
             onPressed: toggleFileReadStatus,
           ),
           IconButton(icon: const Icon(Icons.info), onPressed: () {},),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {},
+            tooltip: "Refresh file in database",
+          ),
           // PopupMenuButton(
           //   icon: Icon(Icons.share),
           //   itemBuilder: (context) => [
@@ -43,19 +48,38 @@ class FileOptionBar extends StatelessWidget {
     );
   }
 
-  void toggleFileReadStatus(){
-    if (file.read) {
-      file.currentPage == 0;
-      ServiceFile.setCurrentPage(file, 0).then((value) => {
-        onFileModified(value)
-      });
+  // /// This method only exist to allow calling b
+  // void readButtonPressed() {
+  //   toggleFileReadStatus().then((value) => onFileModified());
+  // }
+
+  Future<void> toggleFileReadStatus() async {
+    int index = 0;
+    if (selectedFiles[0].read) {
+      for (var file in selectedFiles) {
+        selectedFiles[index] = await ServiceFile.setCurrentPage(file, 0);
+        index++;
+      }
     } else {
-      file.currentPage == file.pagesCount - 1;
-      ServiceFile.setCurrentPage(file, file.pagesCount - 1).then((value) =>
-      {
-        onFileModified(value)
-      });
+      for (var file in selectedFiles) {
+        selectedFiles[index] = await ServiceFile.setCurrentPage(file, file.pagesCount - 1);
+        index++;
+      }
     }
+    onFileModified();
   }
+
+  // void regenFile(){
+  //   FutureBuilder(
+  //     future: ServiceFile.regenFileData(file),
+  //       builder: (context, snapshot) {
+  //         if (snapshot.connectionState == ConnectionState.done) {
+  //           if (snapshot.hasData){
+  //             file = snapshot.data;
+  //           }
+  //         }
+  //       }
+  //   );
+  // }
 
 }
