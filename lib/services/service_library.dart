@@ -35,7 +35,7 @@ class ServiceLibrary {
 
   /// Get the content of a directory in a library
   static Future<List> getLibraryContent(Library library, String directoryPath) async {
-    final response = await http.get(Uri.parse('http://${ServiceSettings.apiUrl}/library/${library.name}/content/?path=$directoryPath'));
+    final response = await http.get(Uri.parse('http://${ServiceSettings.apiUrl}/library/${library.name}/content/?path=${Uri.encodeComponent(directoryPath)}'));
 
     if (response.statusCode == 200) {
       final List<dynamic> json = jsonDecode(utf8.decode(response.bodyBytes));
