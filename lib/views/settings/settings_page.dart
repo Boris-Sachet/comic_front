@@ -34,10 +34,23 @@ class SettingsPageState extends State<SettingsPage> {
                   },
                 )
               ],
+            ),
+            SettingsSection(
+              title: const Text("Libraries"),
+              tiles: <SettingsTile>[
+                SettingsTile.switchTile(
+                  title: const Text('Show hidden libraries'),
+                  initialValue: ServiceSettings.showHiddenLibraries,
+                  onToggle: (bool value) {
+                    setState(() {
+                      ServiceSettings.showHiddenLibraries = !ServiceSettings.showHiddenLibraries;
+                    });
+                  },
+                )
+              ],
             )
           ],
         ),
     );
   }
-
 }

@@ -42,7 +42,15 @@ class LibraryList extends StatelessWidget {
               itemCount: libraries.length,
               scrollDirection: Axis.vertical,
               itemBuilder: (BuildContext context, int index) {
-                return libraryTile(context, libraries[index]);
+                if (libraries[index].hidden){
+                  if (ServiceSettings.showHiddenLibraries) {
+                    return libraryTile(context, libraries[index]);
+                  } else {
+                    return Container();
+                  }
+                } else {
+                  return libraryTile(context, libraries[index]);
+                }
               },
             );
           } else {

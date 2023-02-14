@@ -16,15 +16,17 @@ class ServiceSettings {
   static bool? _darkMode;
 
   static Future<void> init() async {
-    await _initApiUrl();
-    await _initCurrentLibrary();
-    await _initShowHiddenLibraries();
-    await _initDarkMode();
-  }
-
-  /// Get the apiUrl from persistent storage and retrieve it from api if it exist
-  static Future<void> _initApiUrl() async {
     final prefs = await SharedPreferences.getInstance();
+    _initApiUrl(prefs);
+    await _initCurrentLibrary(prefs);
+    _initShowHiddenLibraries();
+    _initDarkMode(prefs);
+  }
+  //=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+  // API URL
+  //=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+  /// Get the apiUrl from persistent storage and retrieve it from api if it exist
+  static void _initApiUrl(SharedPreferences prefs)  {
     _apiUrl = prefs.getString('apiUrl');
   }
 
@@ -51,10 +53,12 @@ class ServiceSettings {
     on TimeoutException catch (_) { return false; }
   }
 
+  //=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+  // Current Library
+  //=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
   /// Get the current library from persistent storage and retrieve it from api if it exist
-  static Future<void> _initCurrentLibrary() async {
+  static Future<void> _initCurrentLibrary(SharedPreferences prefs) async {
     if (_apiUrl != null) {
-      final prefs = await SharedPreferences.getInstance();
       final prefCurrentLibraryName = prefs.getString('currentLibraryName');
       if (prefCurrentLibraryName != null) {
         _currentLibrary = await ServiceLibrary.getLibrary(prefCurrentLibraryName);
@@ -74,10 +78,14 @@ class ServiceSettings {
     });
   }
 
+  //=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+  // Show Hidden Libraries
+  //=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
   /// Get wether or not the hiddenLibraries are shown from persistent storage and retrieve it from api if it exist
-  static Future<void> _initShowHiddenLibraries() async {
-    final prefs = await SharedPreferences.getInstance();
-    _showHiddenLibraries = prefs.getBool('showHiddenLibraries') ?? false;
+  static void _initShowHiddenLibraries() {
+    // final prefs = await SharedPreferences.getInstance();
+    // _showHiddenLibraries = prefs.getBool('showHiddenLibraries') ?? false;
+    _showHiddenLibraries = false;
   }
 
   static bool get showHiddenLibraries {
@@ -86,12 +94,14 @@ class ServiceSettings {
 
   static set showHiddenLibraries(bool show) {
     _showHiddenLibraries = show;
-    SharedPreferences.getInstance().then((pref) => pref.setBool('currentLibraryName', show).then((value) => {}));
+    // SharedPreferences.getInstance().then((pref) => pref.setBool('showHiddenLibraries', show).then((value) => {}));
   }
 
+  //=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+  // Dark Mode
+  //=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
   /// Get the darkMode status from persistent storage and retrieve it from api if it exist
-  static Future<void> _initDarkMode() async {
-    final prefs = await SharedPreferences.getInstance();
+  static void _initDarkMode(SharedPreferences prefs) {
     _darkMode = prefs.getBool('darkMode') ?? WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
   }
 
