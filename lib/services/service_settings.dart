@@ -37,6 +37,7 @@ class ServiceSettings {
   static set apiUrl(String? url) {
     _apiUrl = url;
     SharedPreferences.getInstance().then((pref) => {
+      ServiceSettings.currentLibrary = null,
       if (url != null) {pref.setString('apiUrl', url)} else {pref.remove('apiUrl')}
     });
   }
