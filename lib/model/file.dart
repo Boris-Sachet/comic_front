@@ -6,7 +6,9 @@ class File {
   final String id;
   final String name;
   final int pagesCount;
-  late  int currentPage;
+  int currentPage;
+  final DateTime addDate;
+  final DateTime updateDate;
   final Library library;
 
   File({
@@ -14,6 +16,8 @@ class File {
     required this.name,
     required this.pagesCount,
     required this.currentPage,
+    required this.addDate,
+    required this.updateDate,
     required this.library,
   });
 
@@ -23,6 +27,8 @@ class File {
       name: json['name'],
       pagesCount: json['pages_count'],
       currentPage: json['current_page'],
+      addDate: DateTime.parse(json['add_date']),
+      updateDate: DateTime.parse(json['update_date']),
       library: library,
     );
   }
