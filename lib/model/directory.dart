@@ -1,10 +1,14 @@
+import '../services/service_settings.dart';
+
 class Directory {
   final String name;
   final String path;
+  final String? thumbnailId;
 
   const Directory ({
     required this.name,
     required this.path,
+    this.thumbnailId,
   });
 
   static const Directory root = Directory(name: 'root', path: '/');
@@ -13,6 +17,7 @@ class Directory {
     return Directory(
       name: json['name'],
       path: json['path'],
+      thumbnailId: json['thumbnail_id'],
     );
   }
 
@@ -32,5 +37,9 @@ class Directory {
 
   bool isRoot() {
     return path == root.path;
+  }
+
+  String get thumbnailUrl {
+    return 'http://${ServiceSettings.apiUrl}/file/${ServiceSettings.currentLibrary!.name}/$thumbnailId/cover';
   }
 }
